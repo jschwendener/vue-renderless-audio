@@ -1,8 +1,16 @@
 {
   "name": "vue-renderless-audio",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Build your own audio player using a renderless Vue component",
-  "keywords": ["vue", "audio", "music", "sound", "player", "renderless", "component"],
+  "keywords": [
+    "vue",
+    "audio",
+    "music",
+    "sound",
+    "player",
+    "renderless",
+    "component"
+  ],
   "author": {
     "name": "Jonas Schwendener",
     "email": "jonas.schwendener@gmail.com"
