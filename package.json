@@ -1,6 +1,6 @@
 {
   "name": "vue-renderless-audio",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Build your own audio player using a renderless Vue component",
   "author": {
     "name": "Jonas Schwendener",
@@ -10,7 +10,9 @@
   "bugs": "https://github.com/jschwendener/vue-renderless-audio/issues",
   "private": false,
   "license": "MIT",
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "build": "vue-cli-service build --target lib --name renderlessAudio src/RenderlessAudio.vue",
     "lint": "vue-cli-service lint"
