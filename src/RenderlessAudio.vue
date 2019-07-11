@@ -4,7 +4,7 @@
             :controls="expose.controls"
             :time="expose.time"
             :state="expose.state"
-            :player="player">
+            :el="player">
         </slot>
         <audio 
             ref="audio" 
@@ -160,6 +160,7 @@ export default {
                     unmute: this.unmute,
                     toggleMuted: this.toggleMuted,
                     seek: this.seek,
+                    setPlayedTime: this.setPlayedTime,
                     toggleLooping: this.toggleLooping,
                     setPlaybackRate: this.setPlaybackRate,
                     reload: this.reload,
@@ -201,7 +202,10 @@ export default {
         stop() {
             this.player.pause()
             this.player.currentTime = 0
-            this.$emit('stopped')
+            this.$emit('stopped', {
+                target: this.player,
+                controls: this.expose.controls
+            })
         },
         togglePlay() {
             if (this.isPlaying) {
@@ -231,7 +235,10 @@ export default {
                 throw new Error('progress should be a number between 0 and 100 (percent)')
             }
 
-            this.player.currentTime = this.player.duration / 100 * progress
+            this.setPlayedTime(this.player.duration / 100 * progress)
+        },
+        setPlayedTime(seconds) {
+            this.player.currentTime = seconds
         },
         toggleLooping() {
             this.isLooping = !this.isLooping
@@ -241,6 +248,10 @@ export default {
             this.player.playbackRate = value
         },
         reload() {
+            this.isReady = false
+            this.isLoaded = false
+            this.playedTime = 0
+            this.setPlayerInitState()
             this.player.load()
         },
         download() {
@@ -277,12 +288,15 @@ export default {
                 this.isPlaying = false
             })
 
-            this.player.addEventListener('ended', e => {
+            this.player.addEventListener('ended', () => {
                 this.isPlaying = false
                 this.hasEnded = true
                 
                 if(this.isLooping) {
-                    this.$emit('looped', e)
+                    this.$emit('looped', {
+                        target: this.player,
+                        controls: this.expose.controls
+                    })
                 }
             })
 
@@ -372,6 +386,18 @@ export default {
     },
 
     watch: {
+        sources(value) {
+            this.$nextTick(() => {
+                this.reload()
+
+                this.$emit('source-changed', {
+                    source: value,
+                    target: this.player,
+                    controls: this.expose.controls
+                })
+            })
+        },
+
         playbackRate(value) {
             this.setPlaybackRate(value)
         },

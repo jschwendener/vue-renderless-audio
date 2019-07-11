@@ -1,4 +1,4 @@
-# Vue renderless audio
+# vue-renderless-audio
 > A completely __renderless__ Vue (2.x) component to help you build __custom audio players__.
 
 ⚠️ This component is still in heavy development and should not be used in any production environment (or at your own risk)!
@@ -21,14 +21,14 @@ $ yarn add vue-renderless-audio
 
 ## Setup
 Register the component either globally or locally
-```javascript
+```js
 // Global registration
 import Vue from 'vue'
 import RenderlessAudio from 'vue-renderless-audio'
 Vue.component('renderless-audio', RenderlessAudio)
 ```
 
-```javascript
+```js
 // Local registration
 import RenderlessAudio from 'vue-renderless-audio'
 export default {
@@ -129,10 +129,10 @@ The source of your audio file as a string or as an object array for multiple fil
 - default: `null`
 
 ```html
-<!-- Single file type --->
+<!-- Single file type -->
 <renderless-audio src="/some-audio-file.mp3"></renderless-audio>
 
-<!-- Multiple file types --->
+<!-- Multiple file types -->
 <renderless-audio :src="[
     { src: '/some-audio-file.mp3', type: 'audio/mp3' },
     { src: '/some-audio-file.ogg', type: 'audio/ogg' }
@@ -193,7 +193,7 @@ For some props it's useful to have "two-way-binding". You can use the `.sync` mo
     :muted.sync="noSound">
 </renderless-audio>
 ```
-```javascript
+```js
 export default {
     ...
     data() {
@@ -219,7 +219,7 @@ All your markup goes into the __default__ slot.
 </renderless-audio>
 ```
 
-The slot scope exposes three objects `controls`, `time` and `state` containing all necessary info and methods to control playback:
+The slot scope exposes objects `controls`, `time`, `state` and `el` containing all necessary info and methods to control playback:
 
 #### controls
 Method | Description
@@ -261,8 +261,11 @@ Property | Type | Description
 `state.buffered` | `Array` | An array of all buffered timeranges, containing info about _start_, _end_ and _width_ (length) of buffered range. All numbers are percentages.
 `state.currentSource`| `String`| Currently loaded source file
 
+#### el
+The `el` object allows direct acces to the `<audio>` element.
+
 ### Events
-All native DOM events ([Media events](https://developer.mozilla.org/en-US/docs/Web/Guide/Events/Media_events)) of the underlying `audio` element are passed to the root of the component.
+All native DOM events ([Media events](https://developer.mozilla.org/en-US/docs/Web/Guide/Events/Media_events)) of the underlying `<audio>` element are passed to the root of the component.
 Which means you can listen for native events directly on the `<renderless-audio>` component (Without the `.native` modifier!).
 ```html
 <renderless-audio
@@ -274,13 +277,37 @@ Which means you can listen for native events directly on the `<renderless-audio>
 ```
 
 __Additional events__
-In addition to the native media events, the component emits a few more useful events:
-
+In addition to the native media events, the component emits a few more useful events.
 Event | Data | Description
 --- | --- | ---
-`init`| `Object` | Fires when component is mounted and has been initialized. Passes and object with _target_ (`<audio>` element) and _controls_ (All methods from the [controls](#controls) section).
-`stopped`| none | Fires when playback has stopped after calling `controls.stop()`
-`looped`| `Event` | Fires when playback has reached the end and looping is active
+`init`| `Object` | Fires when component is mounted and has been initialized.
+`source-changed`| `Object` | Fires when the source file changed. (Also passes the new source as _source_ to the listener)
+`stopped`| `Object` | Fires when playback has stopped after calling `controls.stop()`
+`looped`| `Object` | Fires when playback has reached the end and looping is active
+
+All of these events pass an object with (at least) the _target_ and _controls_ fields to the listener:
+```js
+{
+    // The `<audio>` element itself
+    target: HTMLAudioElement
+
+    // All functions described in the slot-scope 'controls' section
+    controls: Array<Function>
+
+    ...
+}
+```
+
+This can be very useful if you want to directly react to certain events.
+In the following example we're immediately starting playback after the source has changed and muting the sound after the first loop:
+```html
+<renderless-audio
+    :src="myDynamicSource"
+    @source-changed="$event.controls.play()"
+    @looped="$event.controls.mute()">
+    ...
+</renderless-audio>
+```
 
 __Prop update events__
 You can listen to prop update events with `@update:propName` ('propName' being the actual name of the prop) or simply use the `.sync` modifier. (See: [Sync props back to parent](#sync-props-back-to-parent))
@@ -350,7 +377,7 @@ export default {
 ```
 
 ## Browser Support
-All browsers supporting Vue 2.x and the `<audio>` element should have no known issues.
+This component has not been properly tested yet, but I'm planning to target all browsers supporting Vue 2.x and the `<audio>` element.
 
 ## License
 [MIT](https://github.com/sagalbot/vue-select/blob/master/LICENSE.md)
