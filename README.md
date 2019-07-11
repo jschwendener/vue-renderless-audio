@@ -3,7 +3,16 @@
 
 ⚠️ This component is still in heavy development and should not be used in any production environment (or at your own risk)!
 
-[TOC]
+- [Install](#install)
+- [Setup](#setup)
+- [Example implementation](#example-implementation)
+- [Documentation](#documentation)
+    - [Props](#props)
+    - [Slot](#slot)
+    - [Events](#events)
+    - [Access from outside](#access-player-controls-from-outside)
+- [Browser support](#browser-support)
+- [License](#license)
 
 #### What does "renderless" mean?
 A renderless component only provides __functionality__ and leaves you in full control over __markup and styling__.
@@ -122,7 +131,7 @@ export default {
 
 ## Documentation
 ### Props
-__src__ _(required)_
+__src__ _(required)_<br>
 The source of your audio file as a string or as an object array for multiple file types (containing _src_ and _type_ properties).
 
 - type: `String` or `Array`
@@ -139,48 +148,48 @@ The source of your audio file as a string or as an object array for multiple fil
 ]"></renderless-audio>
 ```
 
-__muted__
+__muted__<br>
 Sets player muted attribute
 - type: `Boolean` 
 - default: `false`
 
-__autoplay__
+__autoplay__<br>
 Sets player autoplay attribute
 - type: `Boolean` 
 - default: `false`
 > Be aware of browsers [autoplay policies](https://developers.google.com/web/updates/2017/09/autoplay-policy-changes). In most modern browsers, some kind of user action (eg. click) is required to autoplay media.
 
-__loop__
+__loop__<br>
 Sets player loop attribute
 - type: `Boolean` 
 - default: `false`
 
-__volume__
+__volume__<br>
 Sets player volume, must be a floating digit between 0 and 1. (eg. `0.75` stands for 75% volume)
 - type: `Number` 
 - default: `1`
 
-__playbackRate__
+__playbackRate__<br>
 Sets the speed at which the media is being played back. The normal playback rate is multiplied by this value to obtain the current rate, so a value of `1.0` indicates normal speed.
 - type: `Number` 
 - default: `1`
 
-__start__
+__start__<br>
 Offsets the position where playback begins (in seconds). Must be greater than or equals `0`.
 - type: `Number`
 - default: `0`
 
-__preload__
+__preload__<br>
 Sets the player preload attribute. Hints to the browser how or if to preload data. Must be `'none'` `'metadata'` or `'auto'`
 - type: `String``
 - default: `'auto'`
 
-__crossorigin__
+__crossorigin__<br>
 Sets the player crossorigin attribute. Lets you configure the [CORS](https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS) requests for the element's fetched data. Must be `'anonymous'` or `'use-credentials'`
 - type: `String``
 - default: `null`
 
-__native__
+__native__<br>
 Shows the native audio player if set to true. Most likely you would only want to use this for development and debugging purposes.
 - type: `Boolean` 
 - default: `false`
@@ -276,8 +285,9 @@ Which means you can listen for native events directly on the `<renderless-audio>
 </renderless-audio>
 ```
 
-__Additional events__
+__Additional events__<br>
 In addition to the native media events, the component emits a few more useful events.
+
 Event | Data | Description
 --- | --- | ---
 `init`| `Object` | Fires when component is mounted and has been initialized.
@@ -309,7 +319,7 @@ In the following example we're immediately starting playback after the source ha
 </renderless-audio>
 ```
 
-__Prop update events__
+__Prop update events__<br>
 You can listen to prop update events with `@update:propName` ('propName' being the actual name of the prop) or simply use the `.sync` modifier. (See: [Sync props back to parent](#sync-props-back-to-parent))
 
 ### Access player controls from outside
