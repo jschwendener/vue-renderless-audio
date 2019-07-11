@@ -1,43 +1,11 @@
 <template>
     <div>
         <slot 
-            :controls="{
-                play,
-                pause,
-                stop,
-                togglePlay,
-                setVolume,
-                mute,
-                unmute,
-                toggleMuted,
-                seek,
-                toggleLooping,
-                setPlaybackRate,
-                reload,
-                download
-            }"
-            :time="{
-                played: playedTime,    
-                remaining: remainingTime,
-                duration: duration,
-                format: formatTime    
-            }"
-            :state="{
-                progress,
-                buffered,
-                isReady,
-                isPlaying,
-                isMuted,
-                isWaiting,
-                hasEnded,
-                volume: currentVolume,
-                isLooping,
-                isLoaded,
-                playbackRate: speed,
-                currentSource
-            }"
-            :player="player"
-        ></slot>
+            :controls="expose.controls"
+            :time="expose.time"
+            :state="expose.state"
+            :player="player">
+        </slot>
         <audio 
             ref="audio" 
             :autoplay="autoplay"
@@ -47,6 +15,7 @@
             :controls="native"
             v-show="native"
             v-on="$listeners">
+            Your browser does not support the <code>audio</code> element.
             <source 
                 v-for="(source, index) in sources" 
                 :key="index"
@@ -98,7 +67,10 @@ export default {
         },
         start: {
             type: Number,
-            default: 0
+            default: 0,
+            validator(value) {
+                return value >= 0
+            }
         },
         preload: {
             type: String,
@@ -124,6 +96,11 @@ export default {
         this.player = this.$refs.audio
         this.setPlayerInitState()
         this.setupNativeEvents()
+
+        this.$emit('init', {
+            target: this.player,
+            controls: this.expose.controls
+        })
     },
 
     data() {
@@ -169,7 +146,49 @@ export default {
 
         remainingTime() {
             return this.duration - this.playedTime
-        }
+        },
+
+        expose() {
+            return {
+                controls: {
+                    play: this.play,
+                    pause: this.pause,
+                    stop: this.stop,
+                    togglePlay: this.togglePlay,
+                    setVolume: this.setVolume,
+                    mute: this.mute,
+                    unmute: this.unmute,
+                    toggleMuted: this.toggleMuted,
+                    seek: this.seek,
+                    toggleLooping: this.toggleLooping,
+                    setPlaybackRate: this.setPlaybackRate,
+                    reload: this.reload,
+                    download: this.download
+                },
+
+                time: {
+                    played: this.playedTime,    
+                    remaining: this.remainingTime,
+                    duration: this.duration,
+                    format: this.formatTime    
+                },
+
+                state: {
+                    progress: this.progress,
+                    buffered: this.buffered,
+                    isReady: this.isReady,
+                    isPlaying: this.isPlaying,
+                    isMuted: this.isMuted,
+                    isWaiting: this.isWaiting,
+                    hasEnded: this.hasEnded,
+                    volume: this.currentVolume,
+                    isLooping: this.isLooping,
+                    isLoaded: this.isLoaded,
+                    playbackRate: this.speed,
+                    currentSource: this.currentSource
+                }
+            }
+        },
     },
 
     methods: {
@@ -258,12 +277,12 @@ export default {
                 this.isPlaying = false
             })
 
-            this.player.addEventListener('ended', () => {
+            this.player.addEventListener('ended', e => {
                 this.isPlaying = false
                 this.hasEnded = true
                 
                 if(this.isLooping) {
-                    this.$emit('looped')
+                    this.$emit('looped', e)
                 }
             })
 
